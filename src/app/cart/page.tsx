@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import RemoveFromCartButton from '@/components/RemoveFromCartButton';
 
 export default async function CartPage() {
   const user = await prisma.user.findFirst();
@@ -50,7 +51,7 @@ export default async function CartPage() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <p style={{ fontWeight: 800, fontSize: '1.25rem', marginBottom: '0.5rem' }}>${(item.product.price * item.quantity).toFixed(2)}</p>
-                  <button style={{ color: '#ef4444' }}><Trash2 size={18} /></button>
+                  <RemoveFromCartButton cartItemId={item.id} />
                 </div>
               </div>
             ))}

@@ -48,6 +48,19 @@ export async function toggleWishlist(userId: number, productId: number) {
   }
 }
 
+export async function removeFromCart(cartItemId: number) {
+  try {
+    await prisma.cartItem.delete({
+      where: { id: cartItemId },
+    });
+    revalidatePath('/', 'layout');
+    return { success: true };
+  } catch (error) {
+    console.error('Error removing from cart:', error);
+    return { success: false };
+  }
+}
+
 export async function registerUser(formData: FormData) {
   const fullName = formData.get('fullName') as string;
   const email = formData.get('email') as string;
