@@ -47,7 +47,6 @@ export async function toggleWishlist(userId: number, productId: number) {
     return { success: false };
   }
 }
-
 export async function removeFromCart(cartItemId: number) {
   try {
     await prisma.cartItem.delete({
@@ -57,6 +56,77 @@ export async function removeFromCart(cartItemId: number) {
     return { success: true };
   } catch (error) {
     console.error('Error removing from cart:', error);
+    return { success: false };
+  }
+}
+
+export async function processCheckout(userId: number) {
+  try {
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: { items: { include: { product: true } } }
+    });
+
+    if (!cart || cart.items.length === 0) return { success: false, error: 'Cart is empty' };
+
+    const totalAmount = cart.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0) + 20; // +20 shipping
+
+    // Create Order
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        totalAmount,
+        status: 'PAID',
+        items: {
+          create: cart.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.product.price
+          }))
+        }
+      }
+    });
+
+    // Clear Cart
+    await prisma.cartItem.deleteMany({
+      where: { cartId: cart.id }
+    });
+
+    // Send Receipt Notification (Mobile simulation)
+    await prisma.notification.create({
+      data: {
+        userId,
+        message: `Receipt: Payment of $${totalAmount.toFixed(2)} received for Order #${order.id}. Thank you for shopping with ECOMM!`
+      }
+    });
+
+    revalidatePath('/', 'layout');
+    return { success: true, orderId: order.id };
+  } catch (error) {
+    console.error('Checkout error:', error);
+    return { success: false, error: 'Checkout failed' };
+  }
+}
+
+export async function returnOrder(orderId: number) {
+  try {
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'RETURNED_REFUNDED' }
+    });
+
+    // Send Refund Notification
+    await prisma.notification.create({
+      data: {
+        userId: order.userId,
+        message: `Refund Processed: $${order.totalAmount.toFixed(2)} has been refunded to your original payment account for Order #${order.id}.`
+      }
+    });
+
+    revalidatePath('/orders');
+    return { success: true };
+  } catch (error) {
+    console.error('Return error:', error);
     return { success: false };
   }
 }
