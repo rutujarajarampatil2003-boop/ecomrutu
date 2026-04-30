@@ -1,0 +1,43 @@
+if (typeof gb === "undefined") gb = {};
+gb._metrics = gb._metrics || {};
+
+function isIE(userAgent) {
+    userAgent = userAgent || navigator.userAgent;
+    return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+}
+function WinVer()
+{
+    if (isIE() === false)
+    {
+        try{
+            navigator.userAgentData.getHighEntropyValues(["platformVersion"])
+            .then(ua => {
+                if (navigator.userAgentData.platform === "Windows") 
+                {
+                    var majorPlatformVersion = parseInt(ua.platformVersion.split('.')[0]);
+                    if (majorPlatformVersion >= 13) 
+                    {
+                        gb._metrics.WinVer= "WIN11";
+                    }
+                    else if (majorPlatformVersion > 0 && majorPlatformVersion < 13) 
+                    {
+                        gb._metrics.WinVer= "WIN10";
+                    }
+                    else 
+                    {
+                        gb._metrics.WinVer= "Before WIN10";
+                    }
+                    gb._metrics.WinMPVer= majorPlatformVersion;
+                }
+                else 
+                {
+                    gb._metrics.WinVer= "Not WIN";
+                }
+            });
+        }
+        catch(e){
+            gb._metrics.WinVer= "Unidentified";
+        }     
+    }
+}
+WinVer();

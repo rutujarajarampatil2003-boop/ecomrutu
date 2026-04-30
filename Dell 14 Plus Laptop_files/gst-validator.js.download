@@ -1,0 +1,97 @@
+let gstTimer;
+window.gstValidatorBound = window.gstValidatorBound || false;
+ 
+require(['jquery', 'mage/url', 'mage/cookies'], function($, urlBuilder) {
+    if (window.gstValidatorBound) {
+        return; // Already bound → don't bind again
+    }
+    window.gstValidatorBound = true;
+ 
+    $(document).on('blur.gstValidator', 'input[name="custom_attributes[gst_number]"]:visible', function(e) {
+        // Skip Knockout synthetic events
+        if (!e.originalEvent) {
+            return;
+        }
+ 
+        clearTimeout(gstTimer);
+        let $input = $(this);
+        let gstNumber = $input.val();
+        let formKey = $.mage.cookies.get('form_key');
+ 
+        // Create message container under input if not already there
+        if ($input.next('.gst-validation-message').length === 0) {
+            $input.after('<div class="gst-validation-message" style="margin-top:5px; font-weight:normal;"></div>');
+        }
+        let $msg = $input.next('.gst-validation-message');
+ 
+        gstTimer = setTimeout(function() {
+            if (gstNumber.trim() === '') {
+                $msg.text('');
+                $input.css('border', '');
+                // clear message after 2.5 seconds when field is empty
+                setTimeout(() => {
+                    $msg.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }, 2500);
+                return;
+            }
+ 
+            $.ajax({
+                url: urlBuilder.build('gstvalidator/index/validate'),
+                type: 'POST',
+                data: {
+                    gst_number: gstNumber,
+                    form_key: formKey
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log("Response:", response);
+ 
+                    if (response.valid) {
+                        // ✅ GST valid
+                        $msg.text('✅ GST Number is valid')
+                            .css({
+                                'color': 'green',
+                                'display': 'block'
+                            });
+                        $input.css({
+                            'border': '2px solid green',
+                            'color': 'black'
+                        });
+                    } else {
+                        // ❌ GST invalid
+                        $msg.text('❌ Invalid GST Number')
+                            .css({
+                                'color': 'red',
+                                'display': 'block'
+                            });
+                        $input.css('border', '2px solid red');
+                        $input.val('').trigger('change');
+ 
+                        // clear message after 2.5 seconds
+                        setTimeout(() => {
+                            $msg.fadeOut(300, function() {
+                                $input.val('').trigger('change');
+                            });
+                        }, 2500);
+                    }
+                },
+                error: function() {
+                    $msg.text('Error validating GST Number').css({
+                        'color': 'red',
+                        'display': 'block'
+                    });
+                    $input.css('border', '2px solid red');
+ 
+                    // clear message after 2.5 seconds
+                    setTimeout(() => {
+                        $msg.fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    }, 2500);
+                }
+            });
+        }, 500);
+    });
+});

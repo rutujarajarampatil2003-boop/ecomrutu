@@ -1,0 +1,21 @@
+require(['jquery', 'jquery/ui'], function($){
+  jQuery(document).ready( function() {
+    $.ajax({
+	  url: "/oncrediredirect/index/",
+	  dataType: 'json',
+	  type: 'GET',
+	  cache: false,
+	  success: function(html){
+		if(html.msg == 'logged in') {
+			if(html.groupId == 6) {
+				
+					jQuery(".zipchecker-product").hide();
+				
+			}
+		}
+	  }
+	});
+  });
+});
+
+

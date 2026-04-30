@@ -1,0 +1,254 @@
+define([
+    'jquery'
+], function ($) {
+    'use strict';
+
+    return function () {
+
+        // ================================
+        // INLINE PLAY BUTTON (.rwp-play-button)
+        // ================================
+        $(document).on('click', '.rwp-play-button', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $container = $(this).closest('.rwp-video');
+            if (!$container.length) {
+                console.warn('BrightcovePlayer: .rwp-video container not found.');
+                return;
+            }
+
+            if ($container.hasClass('bvc-playing')) return;
+
+            var $bcVideo = $container.find('brightcove-video');
+            var embedUrl = $bcVideo.attr('data-embed-url') || '';
+
+            if (!embedUrl) {
+                try {
+                    var dataObj = $bcVideo.attr('data-object') || '{}';
+                    var parsed = JSON.parse(dataObj);
+                    embedUrl = parsed.EmbedUrl || '';
+                } catch (err) {
+                    console.warn('BrightcovePlayer: embed URL parse error', err);
+                }
+            }
+
+            if (!embedUrl) {
+                console.warn('BrightcovePlayer: No embed URL found.');
+                return;
+            }
+
+            var separator = embedUrl.indexOf('?') !== -1 ? '&' : '?';
+            var finalUrl = embedUrl + separator + 'autoplay=true';
+
+            $container[0].removeAttribute('style');
+            $container.addClass('bvc-playing');
+
+            $container.css({
+                position: 'relative',
+                width: '100%',
+                paddingBottom: '56.25%',
+                height: '0',
+                overflow: 'hidden'
+            });
+
+            $container.children(':not(iframe)').hide();
+
+            var $iframe = $('<iframe>', {
+                src: finalUrl,
+                frameborder: '0',
+                allowfullscreen: true,
+                allow: 'autoplay; encrypted-media; picture-in-picture',
+                title: 'Dell Product Video',
+                class: 'bvc-inline-iframe'
+            }).css({
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 0
+            });
+
+            $container.append($iframe);
+        });
+
+
+        // ================================
+        // OVERLAY VIDEO
+        // ================================
+        function closeBvcOverlay() {
+            $('.bvc-overlay').remove();
+            $('body').css('overflow', '');
+        }
+
+        $(document).on('keydown.bvcOverlay', function (e) {
+            if (e.key === 'Escape') closeBvcOverlay();
+        });
+
+        function launchBvcOverlay(finalUrl) {
+            $('body').css('overflow', 'hidden');
+
+            var $overlay = $('<div>', { class: 'bvc-overlay' }).css({
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: 'rgba(0,0,0,0.85)',
+                zIndex: 99999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            });
+
+            var $wrapper = $('<div>').css({
+                position: 'relative',
+                width: '80%',
+                maxWidth: '1000px',
+                paddingBottom: '39.375%',
+                height: 0,
+                background: '#000'
+            });
+
+            var $closeBtn = $('<button>').html('&times;').css({
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                background: 'transparent',
+                border: 'none',
+                color: '#000',
+                fontSize: '32px',
+                cursor: 'pointer',
+                zIndex: 10
+            }).on('click', closeBvcOverlay);
+
+            var $iframe = $('<iframe>', {
+                src: finalUrl,
+                frameborder: '0',
+                allowfullscreen: true,
+                allow: 'autoplay; encrypted-media; picture-in-picture'
+            }).css({
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 0
+            });
+
+            $wrapper.append($closeBtn).append($iframe);
+            $overlay.append($wrapper);
+            $('body').append($overlay);
+
+            $overlay.on('click', function (e) {
+                if ($(e.target).is($overlay)) closeBvcOverlay();
+            });
+        }
+
+
+        // ================================
+        // BANNER BUTTON (Overlay)
+        // ================================
+        $(document).on('click', '.rwp-videobanner__button', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $container = $(this).closest('.rwp-video');
+            if (!$container.length) {
+                $container = $(this).closest(':has(brightcove-video)');
+            }
+
+            if (!$container.length || $('.bvc-overlay').length) return;
+
+            var $bcVideo = $container.find('brightcove-video');
+            var embedUrl = $bcVideo.attr('data-embed-url') || '';
+
+            if (!embedUrl) {
+                try {
+                    var parsed = JSON.parse($bcVideo.attr('data-object') || '{}');
+                    embedUrl = parsed.EmbedUrl || '';
+                } catch (err) {}
+            }
+
+            if (!embedUrl) return;
+
+            var separator = embedUrl.indexOf('?') !== -1 ? '&' : '?';
+            var finalUrl = embedUrl + separator + 'autoplay=true';
+
+            launchBvcOverlay(finalUrl);
+        });
+
+
+        // ================================
+        // 🔥 BACKGROUND VIDEO (NEW FEATURE)
+        // ================================
+        function initBackgroundVideos() {
+            $('.cp-container-bgvideo').each(function () {
+                var $container = $(this);
+
+                if ($container.hasClass('bvc-bg-initialized')) return;
+
+                var $bgVideo = $container.find('bgvideo');
+                if (!$bgVideo.length) return;
+
+                var videoId = $bgVideo.attr('data-video-id');
+                var account = $bgVideo.attr('data-account') || '6057277732001';
+                var player = $bgVideo.attr('data-player') || 'default';
+
+                if (!videoId) return;
+
+                var embedUrl = 'https://players.brightcove.net/' +
+                    account + '/' + player + '_default/index.html?videoId=' +
+                    videoId + '&autoplay=true&muted=true&loop=true&playsinline=true';
+
+                $container.css({
+                    position: 'relative',
+                    overflow: 'hidden'
+                });
+
+                var $iframe = $('<iframe>', {
+                    src: embedUrl,
+                    frameborder: '0',
+                    allow: 'autoplay; fullscreen',
+                    class: 'bvc-bg-iframe'
+                }).css({
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    width: '177.77%',
+                    height: '100%',
+                    transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none'
+                });
+
+                $container.append($iframe);
+                $container.addClass('bvc-bg-initialized');
+            });
+        }
+
+        // Initial run
+        initBackgroundVideos();
+
+        // Re-run after AJAX (Magento dynamic content)
+        $(document).ajaxComplete(function () {
+            initBackgroundVideos();
+        });
+
+
+        // ================================
+        // HOTSPOT
+        // ================================
+        $(document).on('click', '.rwp-imagehotspot__container__hotspot__open-btn', function () {
+            $('.rwp-imagehotspot__container__hotspot__modal').hide();
+            var id = $(this).attr('aria-controls');
+            if (id) $('#' + id).show();
+        });
+
+        $(document).on('click', '.rwp-imagehotspot__container__hotspot__modal__close-btn', function () {
+            $('.rwp-imagehotspot__container__hotspot__modal').hide();
+        });
+
+        console.log('BrightcovePlayer: Initialized with BG Video support');
+    };
+});

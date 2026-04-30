@@ -1,0 +1,52 @@
+define([
+    'jquery'
+], function ($) {
+    'use strict';
+
+    return function (config, element) {
+
+        var dellProductId = config.dellProductId;
+        var fallbackDescription = config.fallbackDescription || '';
+        var apiUrl = "https://www.dell.com/csbapi/ContentWebParts/in/en/bsd/inbsdt1/" + dellProductId;
+
+        $.ajax({
+            url: apiUrl,
+            method: "GET",
+            success: function (response) {
+
+                console.log(response);
+
+                if (response && response.content) {
+                    $(element).html(response.content);
+                } else if (response && response !== '') {
+                    $(element).html(response);
+                } else {
+                    // Response null/blank - fallback description dikhao
+                    $(element).html('<div class="product-description">' + fallbackDescription + '</div>');
+                }
+
+                /* FIX LAZY IMAGES */
+                $(element).find('img').each(function () {
+                    var src = $(this).attr('data-src');
+                    if (src) {
+                        $(this).attr('src', src);
+                    }
+                });
+
+                $(element).find('source').each(function () {
+                    var srcset = $(this).attr('data-srcset');
+                    if (srcset) {
+                        $(this).attr('srcset', srcset);
+                    }
+                });
+
+                console.log('Custom JS Working.');
+            },
+            error: function (xhr) {
+                console.log("Error:", xhr);
+                $(element).html('<div class="product-description">' + fallbackDescription + '</div>');
+            }
+        });
+
+    };
+});
