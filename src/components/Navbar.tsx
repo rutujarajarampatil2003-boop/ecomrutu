@@ -1,9 +1,18 @@
-'use client';
-
 import Link from 'next/link';
 import { ShoppingCart, User, Search, Heart, Bell } from 'lucide-react';
+import { prisma } from '@/lib/prisma';
 
-export default function Navbar() {
+export default async function Navbar() {
+  const user = await prisma.user.findFirst();
+  const userId = user?.id || 1;
+
+  const cart = await prisma.cart.findUnique({
+    where: { userId },
+    include: { items: true }
+  });
+
+  const cartItemCount = cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
+
   return (
     <nav className="navbar glass">
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -26,7 +35,7 @@ export default function Navbar() {
           </Link>
           <Link href="/cart" style={{ position: 'relative' }}>
             <ShoppingCart size={20} />
-            <span className="badge badge-primary" style={{ position: 'absolute', top: '-8px', right: '-8px', fontSize: '10px', padding: '2px 5px' }}>0</span>
+            <span className="badge badge-primary" style={{ position: 'absolute', top: '-8px', right: '-8px', fontSize: '10px', padding: '2px 5px' }}>{cartItemCount}</span>
           </Link>
           <Link href="/notifications">
             <Bell size={20} />

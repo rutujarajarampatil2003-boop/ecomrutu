@@ -19,7 +19,7 @@ export async function addToCart(userId: number, productId: number) {
       },
     });
 
-    revalidatePath('/cart');
+    revalidatePath('/', 'layout');
     return { success: true };
   } catch (error) {
     console.error('Error adding to cart:', error);
