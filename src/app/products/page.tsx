@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { Filter, Search } from 'lucide-react';
 import AddToCartButton from '@/components/AddToCartButton';
+import LikeButton from '@/components/LikeButton';
 
 export default async function ProductsPage({ 
   searchParams 
@@ -10,6 +11,9 @@ export default async function ProductsPage({
 }) {
   const { category } = await searchParams;
   
+  const user = await prisma.user.findFirst();
+  const userId = user?.id || 1;
+
   const products = await prisma.product.findMany({
     where: category ? { categoryId: parseInt(category) } : {},
     include: {
@@ -95,17 +99,6 @@ export default async function ProductsPage({
           </div>
 
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ fontSize: '1rem', marginBottom: '1rem' }}>Size</h3>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map(size => (
-                <button key={size} className="btn btn-outline" style={{ padding: '0.5rem', minWidth: '40px', fontSize: '0.75rem' }}>
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '2rem' }}>
             <h3 style={{ fontSize: '1rem', marginBottom: '1rem' }}>Price Range</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <input type="range" min="0" max="1000" step="50" style={{ width: '100%' }} />
@@ -115,49 +108,42 @@ export default async function ProductsPage({
               </div>
             </div>
           </div>
-
-          <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ fontSize: '1rem', marginBottom: '1rem' }}>Avg. Customer Review</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {[4, 3, 2, 1].map(stars => (
-                <div key={stars} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
-                  <span style={{ color: '#fbbf24' }}>{'★'.repeat(stars)}{'☆'.repeat(5-stars)}</span>
-                  <span style={{ opacity: 0.6 }}>& Up</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </aside>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-3">
+        <div className="grid grid-cols-3" style={{ gap: '2rem' }}>
           {products.map((product) => (
-            <Link href={`/products/${product.id}`} key={product.id} className="card">
-              <div style={{ 
-                aspectRatio: '1/1', 
-                backgroundColor: 'var(--input)', 
-                borderRadius: 'var(--radius)',
-                overflow: 'hidden',
-                marginBottom: '1rem'
-              }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={product.images[0]?.imageUrl || 'https://via.placeholder.com/400'} 
-                  alt={product.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
+            <div key={product.id} className="card relative group">
+              <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}>
+                <LikeButton productId={product.id} userId={userId} />
               </div>
-              <span style={{ fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase' }}>{product.category.categoryName}</span>
-              <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>{product.name}</h3>
-              <div style={{ display: 'flex', color: '#fbbf24', fontSize: '0.75rem', marginBottom: '0.5rem' }}>
-                {'★'.repeat(Math.round(product.rating || 0))}{'☆'.repeat(5 - Math.round(product.rating || 0))}
-                <span style={{ color: 'var(--foreground)', opacity: 0.5, marginLeft: '0.25rem' }}>(42)</span>
-              </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 800, fontSize: '1.25rem' }}>${product.price}</span>
-                  <AddToCartButton productId={product.id} userId={3} />
+              <Link href={`/products/${product.id}`} style={{ display: 'block' }}>
+                <div style={{ 
+                  aspectRatio: '1/1', 
+                  backgroundColor: 'var(--input)', 
+                  borderRadius: 'var(--radius)',
+                  overflow: 'hidden',
+                  marginBottom: '1rem'
+                }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={product.images[0]?.imageUrl || 'https://via.placeholder.com/400'} 
+                    alt={product.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
                 </div>
-            </Link>
+                <span style={{ fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase' }}>{product.category.categoryName}</span>
+                <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>{product.name}</h3>
+                <div style={{ display: 'flex', color: '#fbbf24', fontSize: '0.75rem', marginBottom: '0.5rem' }}>
+                  {'★'.repeat(Math.round(product.rating || 0) || 4)}{'☆'.repeat(5 - (Math.round(product.rating || 0) || 4))}
+                  <span style={{ color: 'var(--foreground)', opacity: 0.5, marginLeft: '0.25rem' }}>(42)</span>
+                </div>
+              </Link>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                <span style={{ fontWeight: 800, fontSize: '1.25rem' }}>${product.price}</span>
+                <AddToCartButton productId={product.id} userId={userId} />
+              </div>
+            </div>
           ))}
         </div>
       </div>

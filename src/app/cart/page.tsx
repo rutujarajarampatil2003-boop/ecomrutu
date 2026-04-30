@@ -3,9 +3,11 @@ import { Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function CartPage() {
-  // Mocking user id 3 (the customer we seeded)
+  const user = await prisma.user.findFirst();
+  const userId = user?.id || 1;
+
   const cart = await prisma.cart.findUnique({
-    where: { userId: 3 },
+    where: { userId },
     include: {
       items: {
         include: {
@@ -70,9 +72,9 @@ export default async function CartPage() {
                 <span style={{ fontWeight: 700 }}>Total</span>
                 <span style={{ fontWeight: 800, fontSize: '1.5rem', color: 'var(--primary)' }}>${total.toFixed(2)}</span>
               </div>
-              <button className="btn btn-primary" style={{ width: '100%', padding: '1.25rem' }}>
-                Checkout <ArrowRight size={20} />
-              </button>
+              <Link href="/checkout" className="btn btn-primary" style={{ width: '100%', padding: '1.25rem', display: 'block', textAlign: 'center' }}>
+                Checkout <ArrowRight size={20} style={{ display: 'inline', marginLeft: '0.5rem', verticalAlign: 'middle' }} />
+              </Link>
             </div>
           </div>
         </div>

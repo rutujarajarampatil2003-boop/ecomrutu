@@ -1,9 +1,16 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { ShoppingCart, Heart, ShieldCheck, Truck, RotateCcw, Star } from 'lucide-react';
+import Link from 'next/link';
+import AddToCartButton from '@/components/AddToCartButton';
+import LikeButton from '@/components/LikeButton';
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  
+  const user = await prisma.user.findFirst();
+  const userId = user?.id || 1;
+
   const product = await prisma.product.findUnique({
     where: { id: parseInt(id) },
     include: {
@@ -88,12 +95,15 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '4rem' }}>
-            <button className="btn btn-primary" style={{ flex: 1, padding: '1.25rem' }}>
-              <ShoppingCart size={20} /> Add to Cart
-            </button>
-            <button className="btn btn-outline" style={{ padding: '1.25rem' }}>
-              <Heart size={20} />
-            </button>
+            <div style={{ flex: 1 }}>
+              <AddToCartButton productId={product.id} userId={userId} />
+            </div>
+            <Link href={`/checkout`} className="btn btn-primary" style={{ flex: 1, padding: '1.25rem', textAlign: 'center', backgroundColor: '#10b981', color: 'white' }}>
+              Buy Now
+            </Link>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <LikeButton productId={product.id} userId={userId} />
+            </div>
           </div>
 
           <div className="card glass" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
