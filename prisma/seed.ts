@@ -113,11 +113,11 @@ async function main() {
   ];
 
   for (const productData of products) {
-    const { cat, img, ...product } = productData;
+    const { cat, img, desc, ...product } = productData;
     const categoryId = dbCategories[cat].id;
     
     const createdProduct = await prisma.product.create({
-      data: { ...product, categoryId, vendorId: mainVendor.id },
+      data: { ...product, description: desc, categoryId, vendorId: mainVendor.id },
     });
 
     await prisma.productImage.create({
