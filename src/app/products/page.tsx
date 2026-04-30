@@ -22,28 +22,54 @@ export default async function ProductsPage({
 
   return (
     <div className="container" style={{ padding: '4rem 1.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-        <div>
-          <h1 style={{ marginBottom: '0.5rem' }}>
-            {category ? categories.find(c => c.id === parseInt(category))?.categoryName : 'All Products'}
-          </h1>
-          <p style={{ opacity: 0.7 }}>
-            {category ? `Browsing items in ${categories.find(c => c.id === parseInt(category))?.categoryName}` : 'Discover our premium collection.'}
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={18} style={{ position: 'absolute', left: '1rem', opacity: 0.5 }} />
-            <input 
-              type="text" 
-              placeholder="Search products..." 
-              className="card" 
-              style={{ padding: '0.75rem 1rem 0.75rem 2.5rem', width: '300px' }} 
+      <div style={{ 
+        marginBottom: '3rem', 
+        borderRadius: 'var(--radius)', 
+        overflow: 'hidden',
+        position: 'relative',
+        backgroundColor: 'var(--card)'
+      }}>
+        {category && categories.find(c => c.id === parseInt(category))?.imageUrl && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.2 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={categories.find(c => c.id === parseInt(category))?.imageUrl!} 
+              alt="Category Banner" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>
-          <button className="btn btn-outline">
-            <Filter size={18} /> Filter
-          </button>
+        )}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          padding: '3rem 2rem',
+          position: 'relative',
+          zIndex: 1,
+          background: category ? 'linear-gradient(to right, var(--background) 40%, transparent)' : 'transparent'
+        }}>
+          <div>
+            <h1 style={{ marginBottom: '0.5rem', fontSize: '2.5rem', fontWeight: 800 }}>
+              {category ? categories.find(c => c.id === parseInt(category))?.categoryName : 'All Products'}
+            </h1>
+            <p style={{ opacity: 0.7, fontSize: '1.2rem' }}>
+              {category ? categories.find(c => c.id === parseInt(category))?.description || `Browsing items in ${categories.find(c => c.id === parseInt(category))?.categoryName}` : 'Discover our premium collection.'}
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Search size={18} style={{ position: 'absolute', left: '1rem', opacity: 0.5 }} />
+              <input 
+                type="text" 
+                placeholder="Search products..." 
+                className="card" 
+                style={{ padding: '0.75rem 1rem 0.75rem 2.5rem', width: '300px', backgroundColor: 'var(--background)' }} 
+              />
+            </div>
+            <button className="btn btn-outline" style={{ backgroundColor: 'var(--background)' }}>
+              <Filter size={18} /> Filter
+            </button>
+          </div>
         </div>
       </div>
 
