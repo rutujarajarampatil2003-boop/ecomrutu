@@ -50,16 +50,31 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
             </div>
           </div>
 
-          <div className="card">
-            <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <CreditCard /> Payment Details
+          <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
+            <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              Scan & Pay with QR Code
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <input type="text" placeholder="Card Number" className="card" style={{ padding: '0.75rem', backgroundColor: 'var(--input)' }} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <input type="text" placeholder="MM/YY" className="card" style={{ padding: '0.75rem', backgroundColor: 'var(--input)' }} />
-                <input type="text" placeholder="CVC" className="card" style={{ padding: '0.75rem', backgroundColor: 'var(--input)' }} />
-              </div>
+            <div style={{ 
+              backgroundColor: 'white', 
+              padding: '1rem', 
+              borderRadius: 'var(--radius)', 
+              display: 'inline-block',
+              marginBottom: '1.5rem',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=merchant@upi&pn=ECOMM&am=${total.toFixed(2)}&cu=USD`} 
+                alt="Payment QR Code"
+                style={{ width: '200px', height: '200px' }}
+              />
+            </div>
+            <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '1rem' }}>
+              Scan this QR code with your payment app (GPay, PhonePe, Paytm, etc.) to complete the payment of <strong>${total.toFixed(2)}</strong>
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', opacity: 0.5 }}>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo.png" alt="UPI" style={{ height: '20px' }} />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Google_Pay_Logo.svg/2560px-Google_Pay_Logo.svg.png" alt="GPay" style={{ height: '20px' }} />
             </div>
           </div>
         </div>
@@ -89,7 +104,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
             )}
             
             <p style={{ textAlign: 'center', opacity: 0.5, fontSize: '0.875rem', marginTop: '1.5rem' }}>
-              Your payment information is encrypted and secure.
+              Once you have scanned and paid, click the button above to confirm your order.
             </p>
           </div>
         </div>

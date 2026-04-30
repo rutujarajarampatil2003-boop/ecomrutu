@@ -28,7 +28,7 @@ export default function CheckoutForm({ userId }: { userId: number }) {
       className="btn btn-primary" 
       style={{ width: '100%', padding: '1.25rem', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: loading ? 0.7 : 1 }}
     >
-      {loading ? 'Processing...' : 'Pay Now'} <ArrowRight size={20} />
+      {loading ? 'Confirming...' : 'I have Scanned & Paid'} <ArrowRight size={20} />
     </button>
   );
 }
