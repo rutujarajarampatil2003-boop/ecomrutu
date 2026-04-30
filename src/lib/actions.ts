@@ -60,7 +60,7 @@ export async function removeFromCart(cartItemId: number) {
   }
 }
 
-export async function processCheckout(userId: number) {
+export async function processCheckout(userId: number, transactionId: string) {
   try {
     const cart = await prisma.cart.findUnique({
       where: { userId },
@@ -71,12 +71,12 @@ export async function processCheckout(userId: number) {
 
     const totalAmount = cart.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0) + 20; // +20 shipping
 
-    // Create Order
+    // Create Order with PENDING_VERIFICATION status
     const order = await prisma.order.create({
       data: {
         userId,
         totalAmount,
-        status: 'PAID',
+        status: 'PENDING_VERIFICATION',
         items: {
           create: cart.items.map(item => ({
             productId: item.productId,
@@ -92,11 +92,11 @@ export async function processCheckout(userId: number) {
       where: { cartId: cart.id }
     });
 
-    // Send Receipt Notification (Mobile simulation)
+    // Send Receipt Notification with Transaction ID
     await prisma.notification.create({
       data: {
         userId,
-        message: `Receipt: Payment of $${totalAmount.toFixed(2)} received for Order #${order.id}. Thank you for shopping with ECOMM!`
+        message: `Order #${order.id} placed. Status: Pending Verification. Transaction ID: ${transactionId}. Admin will verify your payment of $${totalAmount.toFixed(2)} shortly.`
       }
     });
 
@@ -127,6 +127,29 @@ export async function returnOrder(orderId: number) {
     return { success: true };
   } catch (error) {
     console.error('Return error:', error);
+    return { success: false };
+  }
+}
+
+export async function approveOrder(orderId: number) {
+  try {
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'PAID' }
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: order.userId,
+        message: `Your payment for Order #${order.id} has been verified! We are now processing your order.`
+      }
+    });
+
+    revalidatePath('/admin/orders');
+    revalidatePath('/orders');
+    return { success: true };
+  } catch (error) {
+    console.error('Approve error:', error);
     return { success: false };
   }
 }

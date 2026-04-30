@@ -96,7 +96,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
             </div>
             
             {subtotal > 0 ? (
-              <CheckoutForm userId={userId} />
+              <CheckoutForm userId={userId} total={total} />
             ) : (
               <button disabled className="btn btn-primary" style={{ width: '100%', padding: '1.25rem', opacity: 0.5 }}>
                 Cart is Empty

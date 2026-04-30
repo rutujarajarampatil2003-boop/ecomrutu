@@ -24,6 +24,7 @@ export default async function Navbar() {
           <Link href="/products" className="nav-link">Shop</Link>
           <Link href="/categories" className="nav-link">Categories</Link>
           <Link href="/orders" className="nav-link">Orders</Link>
+          <Link href="/admin/orders" className="nav-link" style={{ color: '#3b82f6', fontWeight: 600 }}>Admin</Link>
         </div>
 
         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
