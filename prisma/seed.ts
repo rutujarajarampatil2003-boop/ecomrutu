@@ -41,8 +41,8 @@ async function main() {
     { name: 'Books', desc: 'Novels, Biographies, and Educational', img: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80' },
     { name: 'Home & Kitchen', desc: 'Furniture, Decor, and Appliances', img: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=800&q=80' },
     { name: 'Sports & Outdoors', desc: 'Fitness Gear and Outdoor Equipment', img: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80' },
-    { name: 'Beauty & Personal Care', desc: 'Skincare, Makeup, and Grooming', img: 'https://images.unsplash.com/photo-1596462502278-27bf85033e5a?w=800&q=80' },
-    { name: 'Toys & Games', desc: 'Fun and Educational Toys for Kids', img: 'https://images.unsplash.com/photo-1558060370-d64111d52c14?w=800&q=80' },
+    { name: 'Beauty & Personal Care', desc: 'Skincare, Makeup, and Grooming', img: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&q=80' },
+    { name: 'Toys & Games', desc: 'Fun and Educational Toys for Kids', img: 'https://images.unsplash.com/photo-1532330393533-443990a51d10?w=800&q=80' },
     { name: 'Groceries', desc: 'Daily Essentials and Fresh Produce', img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80' },
   ];
 
@@ -99,7 +99,7 @@ async function main() {
 
     // Toys & Games
     { name: 'Lego Star Wars', desc: 'Millennium Falcon', price: 159.99, stock: 20, cat: 'Toys & Games', img: 'https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=600&q=80' },
-    { name: 'Board Game - Catan', desc: 'Strategy Game', price: 44.99, stock: 35, cat: 'Toys & Games', img: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffaed?w=600&q=80' },
+    { name: 'Board Game - Catan', desc: 'Strategy Game', price: 44.99, stock: 35, cat: 'Toys & Games', img: 'https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?w=600&q=80' },
     { name: 'Plush Teddy Bear', desc: 'Soft and Cuddly', price: 19.99, stock: 100, cat: 'Toys & Games', img: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=600&q=80' },
     { name: 'Remote Control Car', desc: 'High Speed', price: 39.99, stock: 50, cat: 'Toys & Games', img: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=600&q=80' },
     { name: 'Puzzle 1000 Pieces', desc: 'Landscape View', price: 14.99, stock: 80, cat: 'Toys & Games', img: 'https://images.unsplash.com/photo-1566804554316-24eec38d4e9d?w=600&q=80' },
@@ -107,9 +107,9 @@ async function main() {
     // Groceries
     { name: 'Organic Coffee Beans', desc: 'Dark Roast', price: 15.99, stock: 150, cat: 'Groceries', img: 'https://images.unsplash.com/photo-1559525839-b184a4d698c7?w=600&q=80' },
     { name: 'Extra Virgin Olive Oil', desc: 'Cold Pressed', price: 22.99, stock: 90, cat: 'Groceries', img: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=600&q=80' },
-    { name: 'Almond Butter', desc: 'Creamy and Natural', price: 11.99, stock: 120, cat: 'Groceries', img: 'https://images.unsplash.com/photo-1593922858977-ce222dd3bc46?w=600&q=80' },
-    { name: 'Green Tea Pack', desc: '100 Tea Bags', price: 9.99, stock: 200, cat: 'Groceries', img: 'https://images.unsplash.com/photo-1627492275564-927a4e69d714?w=600&q=80' },
-    { name: 'Oat Milk', desc: 'Plant-based alternative', price: 4.99, stock: 300, cat: 'Groceries', img: 'https://images.unsplash.com/photo-1568181674390-34d6ec5555c2?w=600&q=80' },
+    { name: 'Almond Butter', desc: 'Creamy and Natural', price: 11.99, stock: 120, cat: 'Groceries', img: 'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&q=80' },
+    { name: 'Green Tea Pack', desc: '100 Tea Bags', price: 9.99, stock: 200, cat: 'Groceries', img: 'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&q=80' },
+    { name: 'Oat Milk', desc: 'Plant-based alternative', price: 4.99, stock: 300, cat: 'Groceries', img: 'https://images.unsplash.com/photo-1600718510208-0798357ad4ad?w=600&q=80' },
   ];
 
   for (const productData of products) {

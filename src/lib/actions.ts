@@ -69,7 +69,7 @@ export async function processCheckout(userId: number, transactionId: string) {
 
     if (!cart || cart.items.length === 0) return { success: false, error: 'Cart is empty' };
 
-    const totalAmount = cart.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0) + 20; // +20 shipping
+    const totalAmount = cart.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0); // Shipping is FREE
 
     // Create Order with PENDING_VERIFICATION status
     const order = await prisma.order.create({

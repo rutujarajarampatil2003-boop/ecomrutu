@@ -3,19 +3,32 @@ import { prisma } from '@/lib/prisma';
 import { Filter, Search } from 'lucide-react';
 import AddToCartButton from '@/components/AddToCartButton';
 import LikeButton from '@/components/LikeButton';
+import SearchInput from '@/components/SearchInput';
+import { Suspense } from 'react';
 
 export default async function ProductsPage({ 
   searchParams 
 }: { 
-  searchParams: Promise<{ category?: string }> 
+  searchParams: Promise<{ category?: string, q?: string }> 
 }) {
-  const { category } = await searchParams;
+  const { category, q } = await searchParams;
+  console.log('Search Params:', { category, q });
   
   const user = await prisma.user.findFirst();
   const userId = user?.id || 1;
 
   const products = await prisma.product.findMany({
-    where: category ? { categoryId: parseInt(category) } : {},
+    where: {
+      AND: [
+        category ? { categoryId: parseInt(category) } : {},
+        q ? {
+          OR: [
+            { name: { contains: q } },
+            { description: { contains: q } }
+          ]
+        } : {}
+      ]
+    },
     include: {
       images: true,
       category: true,
@@ -61,15 +74,9 @@ export default async function ProductsPage({
             </p>
           </div>
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Search size={18} style={{ position: 'absolute', left: '1rem', opacity: 0.5 }} />
-              <input 
-                type="text" 
-                placeholder="Search products..." 
-                className="card" 
-                style={{ padding: '0.75rem 1rem 0.75rem 2.5rem', width: '300px', backgroundColor: 'var(--background)' }} 
-              />
-            </div>
+            <Suspense fallback={<div>Loading search...</div>}>
+              <SearchInput />
+            </Suspense>
             <button className="btn btn-outline" style={{ backgroundColor: 'var(--background)' }}>
               <Filter size={18} /> Filter
             </button>
